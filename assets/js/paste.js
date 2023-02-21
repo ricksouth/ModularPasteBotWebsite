@@ -7,7 +7,7 @@ $(document).ready(function(e) {
 
 	if (raw !== "true") {
 		$("#dlfile").html("<p>Download file</p>").attr('href', url);
-		$("#viewrawfile").html("<p>View raw file</p>").attr('href', 'http://localhost/paste?content=' + url + '&raw=true');
+		$("#viewrawfile").html("<p>View raw file</p>").attr('href', 'https://paste.modularity.gg/paste?content=' + url + '&raw=true');
 		loadPasteData(url);
 	}
 	else {
