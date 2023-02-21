@@ -74,8 +74,12 @@ pre code div {
     padding: 0 10px 0 10px;
 }
 pre code table {
+    table-layout: auto;
     width: 100%;
     min-width: 100%;
+}
+pre code tbody tr {
+    white-space: nowrap;
 }
 pre code tbody tr:nth-child(even) {
     background-color: #373a40 !important;
@@ -98,9 +102,6 @@ pre code tbody tr.selected {
     border-right: 1px solid #CCC;
     vertical-align: top;
     padding-right: 5px;
-
-    width: 1%;
-    white-space: nowrap;
 }
 .hljs-ln-numbers:hover {
     cursor: pointer;
