@@ -1,0 +1,32 @@
+@media only screen and (max-width: 400px) {
+    .inside img {
+        width: 100vw !important;
+    }
+}
+
+body {
+    overflow: hidden;
+}
+
+.wrapper {
+    position: absolute;
+    left: calc(50% - 200px);
+    top: calc(50% - 200px);
+    width: 400px;
+    height: 400px;
+}
+
+.inside {
+    width: 100%;
+    height: 100%;
+
+    text-align: center;
+}
+
+.inside img {
+    width: 400px;
+}
+
+.inside a:hover {
+    filter: brightness(120%);
+}
