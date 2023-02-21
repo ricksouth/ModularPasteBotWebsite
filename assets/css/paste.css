@@ -90,6 +90,9 @@ pre code tbody tr.selected {
     border-right: 1px solid #CCC;
     vertical-align: top;
     padding-right: 5px;
+
+    width: 1%;
+    white-space: nowrap;
 }
 .hljs-ln-numbers:hover {
     cursor: pointer;
