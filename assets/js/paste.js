@@ -62,7 +62,9 @@ function loadPasteData(url) {
 						console.log(rows);
 
 						if (rows.length >= lineint) {
-							$(rows[lineint-1]).addClass("selected");
+							let selectedrow = $(rows[lineint-1]);
+							selectedrow.addClass("selected");
+							selectedrow.get(0).scrollIntoView({behavior: 'smooth'});
 						}
 					}, 10);
 				}
