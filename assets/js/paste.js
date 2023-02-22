@@ -52,7 +52,7 @@ function loadPasteData(url, israw) {
 			} catch (e) { }
 
 			if (israw) {
-				$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><div id="rawframe">' + content + '</div>');
+				$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><div id="rawframe"><pre>' + content + '</pre></div>');
 				return;
 			}
 
