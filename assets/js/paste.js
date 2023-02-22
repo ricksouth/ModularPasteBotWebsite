@@ -12,11 +12,10 @@ $(document).ready(function(e) {
 	if (raw !== "true") {
 		$("#dlfile").html("<p>Download file</p>").attr('href', url);
 		$("#viewrawfile").html("<p>View raw file</p>").attr('href', 'https://paste.modularity.gg/paste?content=' + url + '&raw=true');
-		loadPasteData(url);
+		loadPasteData(url, false);
 	}
 	else {
-		let urlsuffix = url.split('/attachments/')[1]
-		$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><iframe id="rawframe" src="' + getUrlPrefix() + urlsuffix + '"></iframe>');
+		loadPasteData(url, true);
 	}
 });
 
@@ -31,8 +30,8 @@ $(document).on('mousedown', 'tr', function(e) {
 	window.history.replaceState(null, document.title, url + "#" + number);
 });
 
-function loadPasteData(url) {
-	let urlsuffix = url.split('/attachments/')[1]
+function loadPasteData(url, israw) {
+	let urlsuffix = url.split('/attachments/')[1].replace(/\//, '_');
 	$.ajax({
 		url: getUrlPrefix() + urlsuffix,
 		type: "GET",
@@ -51,6 +50,11 @@ function loadPasteData(url) {
 					}
 				}
 			} catch (e) { }
+
+			if (israw) {
+				$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><div id="rawframe">' + content + '</div>');
+				return;
+			}
 
 			const celem = $(".pastewrapper code");
 			celem.html(content);
@@ -78,6 +82,7 @@ function loadPasteData(url) {
 
 			setTimeout( function() {
 				setMaxWidthLineNumbers();
+				$(".loadspinner").hide();
 			}, 10);
 		},
 		error: function(data) {

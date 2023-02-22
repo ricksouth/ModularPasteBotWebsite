@@ -10,14 +10,18 @@ body.raw {
     overflow: hidden;
 }
 
-body.raw iframe {
+body.raw #rawframe {
     position: absolute;
     top: 40px;
     left: 0;
     width: 100%;
     height: calc(100% - 40px);
 
+    padding: 10px;
+
+    color: black;
     border: none;
+    white-space: pre-wrap;
 }
 
 .download {
