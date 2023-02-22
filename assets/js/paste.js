@@ -3,6 +3,10 @@ $(document).ready(function(e) {
 	const urlParams = new URLSearchParams(queryString);
 
 	const url = urlParams.get('content');
+	if (!url.startsWith("https://cdn.discordapp.com/attachments/")) {
+		return;
+	}
+
 	const raw = urlParams.get('raw');
 
 	if (raw !== "true") {
@@ -11,7 +15,8 @@ $(document).ready(function(e) {
 		loadPasteData(url);
 	}
 	else {
-		$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><iframe id="rawframe" src="https://ntmsdata.com/api/cors/bypass.php?url=' + url + '"></iframe>');
+		let urlsuffix = url.split('/attachments/')[1]
+		$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><iframe id="rawframe" src="' + getUrlPrefix() + urlsuffix + '"></iframe>');
 	}
 });
 
@@ -27,8 +32,9 @@ $(document).on('mousedown', 'tr', function(e) {
 });
 
 function loadPasteData(url) {
+	let urlsuffix = url.split('/attachments/')[1]
 	$.ajax({
-		url: getUrlPrefix() + url,
+		url: getUrlPrefix() + urlsuffix,
 		type: "GET",
 		dataType: 'text',
 		success: function(content) {
@@ -83,12 +89,12 @@ function setMaxWidthLineNumbers() {
 	let length = $("table tr").length;
 	let count = (length + "").length;
 	let width = count * 7.2;
-	
+
 	$(".hljs-ln-numbers").attr('style', 'width: ' + width + 'px;')
 }
 
 function getUrlPrefix() {
-	return atob("aHR0cHM6Ly9udG1zZGF0YS5jb20vYXBpL2NvcnMvYnlwYXNzLnBocD91cmw9");
+	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy8=");
 }
 
 function isNumeric(value) {
