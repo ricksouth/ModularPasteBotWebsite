@@ -114,4 +114,5 @@ pre code tbody tr.selected {
 
 .hljs-ln-code {
     padding: 0 10px 0 10px !important;
+    white-space: pre !important;
 }
