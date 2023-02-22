@@ -94,7 +94,7 @@ function setMaxWidthLineNumbers() {
 }
 
 function getUrlPrefix() {
-	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy8=");
+	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy9wYXN0ZS8=");
 }
 
 function isNumeric(value) {
