@@ -69,10 +69,22 @@ function loadPasteData(url) {
 					}, 10);
 				}
 			}
+
+			setTimeout( function() {
+				setMaxWidthLineNumbers();
+			}, 10);
 		},
 		error: function(data) {
 		}
 	});
+}
+
+function setMaxWidthLineNumbers() {
+	let length = $("table tr").length;
+	let count = (length + "").length;
+	let width = count * 7.2;
+	
+	$(".hljs-ln-numbers").attr('style', 'width: ' + width + 'px;')
 }
 
 function getUrlPrefix() {
