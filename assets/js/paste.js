@@ -238,7 +238,7 @@ function doExtraProcessing(identifier) {
 			else if (rowhtml.includes("/WARN")) {
 				lineclass = "warning"
 			}
-			else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash")) {
+			else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
 				lineclass = "error"
 			}
 		}
