@@ -141,114 +141,156 @@ function loadPasteData(url, israw) {
 }
 
 function doExtraProcessing(identifier) {
-	$(".content table tr .hljs-ln-code").each(function(e) {
-		let row = $(this);
-		let rowhtml = row.html();
+	if (identifier === "minecraft") {
+		$(".content table tr .hljs-ln-code").each(function (e) {
+			let row = $(this);
+			let rowhtml = row.html();
 
-		let rowoutput = rowhtml;
-		let trimmedrow = rowhtml.trim();
-		if (trimmedrow.includes("]:")) {
-			trimmedrow = trimmedrow.split("]:")[1].trim();
-		}
-
-		let lineclass = "info";
-		if (rowhtml.includes("Caused by: ") || rowhtml.includes("Exception: ") || rowhtml.includes("Error:")) {
-			lineclass = "warning"
-		}
-
-		if (trimmedrow.startsWith("at ") && trimmedrow.includes("(")) {
-			lineclass += " at"
-
-			let lspl = rowhtml.split("at ", 2);
-			let line0 = lspl[1];
-			let line1;
-
-			let wigglesplit = []
-			if (line0.includes(" ~")) {
-				wigglesplit = line0.split(" ~")
-
-				line1 = wigglesplit[0];
-			}
-			else {
-				line1 = line0;
+			let rowoutput = rowhtml;
+			let trimmedrow = rowhtml.trim();
+			if (trimmedrow.includes("]:")) {
+				trimmedrow = trimmedrow.split("]:")[1].trim();
 			}
 
-			let linesuffix = line1.split("(")[1].replace(")", "")
-			if (linesuffix.includes(":")) {
-				linesuffix = "<span class=\"at_line\">L" + linesuffix.split(":")[1] + "</span>"
-			}
-			else {
-				linesuffix = "<span class=\"at_line\">" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
-			}
-
-			let ppackage = ""
-			let mainclass = ""
-			let ffunction = ""
-
-			let line2 = line1.split("(")[0];
-			for (let seg of line2.split(".")) {
-				if (mainclass === "") {
-					if (seg[0] === seg[0].toLowerCase()) {
-						if (ppackage !== "") {
-							ppackage += ".";
-						}
-						ppackage += seg;
-					}
-					else {
-						mainclass = "." + seg
-					}
-				}
-				else {
-					ffunction = "." + seg
-				}
-			}
-
-			if (rowhtml.includes("com.natamus")) {
-				lineclass += " com_natamus"
-			}
-
-			let middle = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + "</span>"
-
-			let mixinsuffix = "";
-			if (wigglesplit.length > 0) {
-				let mixinstuff = wigglesplit[1]
-				if (mixinstuff.includes(":mixin:APP:")) {
-					mixinsuffix = " ~[";
-					for (let mss of mixinstuff.split(":mixin:APP:")) {
-						if (mss.includes("?:?")) {
-							continue;
-						}
-
-						if (mixinsuffix !== " ~[") {
-							mixinsuffix += ", ";
-						}
-
-						mixinsuffix += mss.split(",pl")[0];
-					}
-					mixinsuffix += "]";
-				}
-			}
-
-			rowoutput = lspl[0] + "<span class=\"at_at\">at </span>" + middle + "<span class=\"at_line\">:</span>" + linesuffix + mixinsuffix
-		}
-		else {
-			if (rowhtml.includes("/INFO")) {
-				lineclass = "info"
-			}
-			else if (rowhtml.includes("/WARN")) {
-				lineclass = "warning"
-			}
-			else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
+			let lineclass = "info";
+			if (rowhtml.includes("Caused by: ") || rowhtml.includes("Exception: ") || rowhtml.includes("Error:")) {
 				lineclass = "error"
 			}
-		}
 
-		if (rowoutput.includes("]:")) {
-			let rhspl = rowoutput.split("]:", 2);
-			rowoutput = rhspl[0] + "]:" + "</span><span>" + rhspl[1];
-		}
-		row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
-	});
+			if (trimmedrow.startsWith("at ") && trimmedrow.includes("(")) {
+				lineclass += " at"
+
+				let lspl = rowhtml.split("at ", 2);
+				let line0 = lspl[1];
+				let line1;
+
+				let wigglesplit = []
+				if (line0.includes(" ~")) {
+					wigglesplit = line0.split(" ~")
+
+					line1 = wigglesplit[0];
+				} else {
+					line1 = line0;
+				}
+
+				let linesuffix = line1.split("(")[1].replace(")", "")
+				if (linesuffix.includes(":")) {
+					linesuffix = "<span class=\"at_line\">L" + linesuffix.split(":")[1] + "</span>"
+				} else {
+					linesuffix = "<span class=\"at_line\">" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
+				}
+
+				let ppackage = ""
+				let mainclass = ""
+				let ffunction = ""
+
+				let line2 = line1.split("(")[0];
+				for (let seg of line2.split(".")) {
+					if (mainclass === "") {
+						if (seg[0] === seg[0].toLowerCase()) {
+							if (ppackage !== "") {
+								ppackage += ".";
+							}
+							ppackage += seg;
+						} else {
+							mainclass = "." + seg
+						}
+					} else {
+						ffunction = "." + seg
+					}
+				}
+
+				if (rowhtml.includes("com.natamus")) {
+					lineclass += " com_natamus"
+				}
+
+				let middle = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + "</span>"
+
+				let mixinsuffix = "";
+				if (wigglesplit.length > 0) {
+					let mixinstuff = wigglesplit[1]
+					if (mixinstuff.includes(":mixin:APP:")) {
+						mixinsuffix = " ~[";
+						for (let mss of mixinstuff.split(":mixin:APP:")) {
+							if (mss.includes("?:?")) {
+								continue;
+							}
+
+							if (mixinsuffix !== " ~[") {
+								mixinsuffix += ", ";
+							}
+
+							mixinsuffix += mss.split(",pl")[0];
+						}
+						mixinsuffix += "]";
+					}
+				}
+
+				rowoutput = lspl[0] + "<span class=\"at_at\">at </span>" + middle + "<span class=\"at_line\">:</span>" + linesuffix + mixinsuffix
+			} else {
+				let changed = false;
+				let customoutput = "";
+				for (let word of rowoutput.split(" ")) {
+					if (customoutput !== "") {
+						customoutput += " ";
+					}
+					if (!word.includes(".jar") && !word.includes(".txt") && !word.includes(".json")) {
+						if ((word.match(/\./g) || []).length > 2) {
+							let ppackage = ""
+							let mainclass = ""
+							let ffunction = ""
+
+							for (let seg of word.split(".")) {
+								if (seg.length === 0) {
+									continue;
+								}
+
+								if (mainclass === "") {
+									if (seg[0] === seg[0].toLowerCase()) {
+										if (ppackage !== "") {
+											ppackage += ".";
+										}
+										ppackage += seg;
+									} else {
+										mainclass = "." + seg
+									}
+								} else {
+									ffunction = "." + seg
+								}
+							}
+
+							if (ppackage !== "" && mainclass !== "") {
+								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + "</span>";
+								customoutput += newword;
+								changed = true;
+								continue;
+							}
+						}
+					}
+
+					customoutput += word;
+				}
+
+				if (changed) {
+					rowoutput = customoutput;
+				}
+			}
+
+			if (rowhtml.includes("/INFO")) {
+				lineclass = "info"
+			} else if (rowhtml.includes("/WARN")) {
+				lineclass = "warning"
+			} else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
+				lineclass = "error"
+			}
+
+			if (rowoutput.includes("]:")) {
+				let rhspl = rowoutput.split("]:", 2);
+				rowoutput = rhspl[0] + "]:" + "</span><span>" + rhspl[1];
+			}
+			row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
+		});
+	}
 }
 
 function setMaxWidthLineNumbers() {
