@@ -80,6 +80,10 @@ function loadPasteData(url, israw) {
 			const celem = $(".pastewrapper code");
 			celem.html(content);
 
+			if (content.includes("Minecraft")) {
+				$(".content pre code").addClass("language-java");
+			}
+
 			hljs.highlightAll();
 			hljs.initLineNumbersOnLoad();
 

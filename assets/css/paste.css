@@ -64,6 +64,8 @@ body.raw #rawframe {
     width: 100vw;
 
     text-align: left;
+    overflow: visible;
+    white-space: nowrap;
 }
 .header div {
     display: inline-block;
