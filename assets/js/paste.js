@@ -74,6 +74,7 @@ function loadPasteData(url, israw) {
 			if (israw) {
 				$("body").addClass("raw");
 				$(".content").html('<div id="rawframe"><pre>' + content + '</pre></div>');
+				$(".loadspinner").hide();
 				return;
 			}
 
