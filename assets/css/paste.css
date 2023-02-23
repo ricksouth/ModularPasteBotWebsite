@@ -172,7 +172,10 @@ pre code tbody tr.selected {
 	color: #E9D502;
 }
 .hljs-ln-code span.error {
-	color: #D13F0F;
+	color: #D13F0F !important;
+}
+.hljs-ln-code span.error span {
+    color: #D13F0F !important;
 }
 
 .hljs-ln-code span.at_at {

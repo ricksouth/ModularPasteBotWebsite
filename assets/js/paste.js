@@ -117,9 +117,7 @@ function loadPasteData(url, israw) {
 			}
 
 			setTimeout( function() {
-				if (extraprocessing !== "") {
-					doExtraProcessing(extraprocessing);
-				}
+				doExtraProcessing(extraprocessing);
 
 				setMaxWidthLineNumbers();
 				$(".loadspinner").hide();
@@ -235,7 +233,7 @@ function doExtraProcessing(identifier) {
 						customoutput += " ";
 					}
 					if (!word.includes(".jar") && !word.includes(".txt") && !word.includes(".json")) {
-						if ((word.match(/\./g) || []).length > 2) {
+						if ((word.match(/\./g) || []).length >= 2) {
 							let ppackage = ""
 							let mainclass = ""
 							let ffunction = ""
@@ -257,6 +255,12 @@ function doExtraProcessing(identifier) {
 								} else {
 									ffunction = "." + seg
 								}
+							}
+
+							if (mainclass.includes("$") && ffunction === "") {
+								let mcspl = mainclass.split("$");
+								mainclass = mcspl[0] + "$";
+								ffunction = mcspl[1];
 							}
 
 							if (ppackage !== "" && mainclass !== "") {
@@ -289,6 +293,21 @@ function doExtraProcessing(identifier) {
 				rowoutput = rhspl[0] + "]:" + "</span><span>" + rhspl[1];
 			}
 			row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
+		});
+	}
+	else {
+		$(".content table tr .hljs-ln-code").each(function (e) {
+			let row = $(this);
+			let rowhtml = row.html();
+			let newrowhtml = rowhtml;
+
+			if (rowhtml.includes("Error") || rowhtml.includes("Exception")) {
+				newrowhtml = '<span class="error">' + rowhtml + '</span>';
+			}
+
+			if (rowhtml !== newrowhtml) {
+				row.html(newrowhtml);
+			}
 		});
 	}
 }
