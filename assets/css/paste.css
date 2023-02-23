@@ -164,3 +164,31 @@ pre code tbody tr.selected {
     padding: 0 10px 0 10px !important;
     white-space: pre !important;
 }
+
+.hljs-ln-code span.info {
+	color: #D3D3D3;
+}
+.hljs-ln-code span.warning {
+	color: #CC3300;
+}
+.hljs-ln-code span.error {
+	color: #D13F0F;
+}
+
+.hljs-ln-code span.at_at {
+	padding-left: 12px;
+	filter: brightness(0.9);
+}
+
+.hljs-ln-code .at_package {
+	color: #E5C07B;
+}
+.hljs-ln-code .at_mainclass {
+	color: #2AA198;
+}
+.hljs-ln-code .at_function {
+	color: #FB9522;
+}
+.hljs-ln-code .at_line {
+	color: #AC80FF;
+}

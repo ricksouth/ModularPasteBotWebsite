@@ -26,6 +26,8 @@ $(document).ready(function(e) {
 		$("#viewrawfile").html("<p>View formatted file</p>").attr('href', '/paste?content=' + url + '&raw=false');
 		loadPasteData(url, true);
 	}
+
+	checkHeaderWidth();
 });
 
 $(document).on('mousedown', 'tr', function(e) {
@@ -48,6 +50,10 @@ $(document).on('change', '#fixedcb', function() {
 		$(".pastewrapper").removeClass("fixed");
 	}
 	Cookies.set('fixedheader', checked, { expires: 365 });
+});
+
+$(window).on('resize', function(e) {
+	checkHeaderWidth();
 });
 
 function loadPasteData(url, israw) {
@@ -81,11 +87,15 @@ function loadPasteData(url, israw) {
 			const celem = $(".pastewrapper code");
 			celem.html(content);
 
+			let extraprocessing = "";
 			if (content.includes("Minecraft")) {
-				$(".content pre code").addClass("language-java");
+				$(".content pre code").addClass("hljs");
+				extraprocessing = "minecraft";
+			}
+			else {
+				hljs.highlightAll();
 			}
 
-			hljs.highlightAll();
 			hljs.initLineNumbersOnLoad();
 
 			let fullurl = window.location.href;
@@ -107,6 +117,10 @@ function loadPasteData(url, israw) {
 			}
 
 			setTimeout( function() {
+				if (extraprocessing !== "") {
+					doExtraProcessing(extraprocessing);
+				}
+
 				setMaxWidthLineNumbers();
 				$(".loadspinner").hide();
 			}, 10);
@@ -126,12 +140,134 @@ function loadPasteData(url, israw) {
 	});
 }
 
+function doExtraProcessing(identifier) {
+	$(".content table tr .hljs-ln-code").each(function(e) {
+		let row = $(this);
+		let rowhtml = row.html();
+
+		let rowoutput = rowhtml;
+		let trimmedrow = rowhtml.trim();
+		if (trimmedrow.includes("]:")) {
+			trimmedrow = trimmedrow.split("]:")[1].trim();
+		}
+
+		let lineclass = "info";
+		if (rowhtml.includes("Caused by: ") || rowhtml.includes("Exception: ") || rowhtml.includes("Error:")) {
+			lineclass = "warning"
+		}
+
+		if (trimmedrow.startsWith("at ") && trimmedrow.includes("(")) {
+			lineclass += " at"
+
+			let lspl = rowhtml.split("at ", 2);
+			let line0 = lspl[1];
+			let line1;
+
+			let wigglesplit = []
+			if (line0.includes(" ~")) {
+				wigglesplit = line0.split(" ~")
+
+				line1 = wigglesplit[0];
+			}
+			else {
+				line1 = line0;
+			}
+
+			let linesuffix = line1.split("(")[1].replace(")", "")
+			if (linesuffix.includes(":")) {
+				linesuffix = "<span class=\"at_line\">L" + linesuffix.split(":")[1] + "</span>"
+			}
+			else {
+				linesuffix = "<span class=\"at_line\">" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
+			}
+
+			let ppackage = ""
+			let mainclass = ""
+			let ffunction = ""
+
+			let line2 = line1.split("(")[0];
+			for (let seg of line2.split(".")) {
+				if (mainclass === "") {
+					if (seg[0] === seg[0].toLowerCase()) {
+						if (ppackage !== "") {
+							ppackage += ".";
+						}
+						ppackage += seg;
+					}
+					else {
+						mainclass = "." + seg
+					}
+				}
+				else {
+					ffunction = "." + seg
+				}
+			}
+
+			if (rowhtml.includes("com.natamus")) {
+				lineclass += " com_natamus"
+			}
+
+			let middle = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + "</span>"
+
+			let mixinsuffix = "";
+			if (wigglesplit.length > 0) {
+				let mixinstuff = wigglesplit[1]
+				if (mixinstuff.includes(":mixin:APP:")) {
+					mixinsuffix = " ~[";
+					for (let mss of mixinstuff.split(":mixin:APP:")) {
+						if (mss.includes("?:?")) {
+							continue;
+						}
+
+						if (mixinsuffix !== " ~[") {
+							mixinsuffix += ", ";
+						}
+
+						mixinsuffix += mss.split(",pl")[0];
+					}
+					mixinsuffix += "]";
+				}
+			}
+
+			rowoutput = lspl[0] + "<span class=\"at_at\">at </span>" + middle + "<span class=\"at_line\">:</span>" + linesuffix + mixinsuffix
+		}
+		else {
+			if (rowhtml.includes("/INFO")) {
+				lineclass = "info"
+			}
+			else if (rowhtml.includes("/WARN")) {
+				lineclass = "warning"
+			}
+			else if (rowhtml.includes("/ERROR")) {
+				lineclass = "error"
+			}
+		}
+
+		row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
+	});
+}
+
 function setMaxWidthLineNumbers() {
 	let length = $("table tr").length;
 	let count = (length + "").length;
 	let width = count * 7.2;
 
 	$(".hljs-ln-numbers").attr('style', 'width: ' + width + 'px;')
+}
+
+function checkHeaderWidth() {
+	let label = $(".fixeddiv label");
+	let position = label.position();
+	let width = 87; // label.width();
+	console.log(width);
+	let rightside = position.left + width + 5;
+
+	if (rightside > $(window).width()) {
+		label.html("FH");
+	}
+	else {
+		label.html("Fixed Header");
+	}
 }
 
 function getUrlPrefix() {
