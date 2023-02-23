@@ -17,13 +17,29 @@
 </head>
 <body>
 	<div class="pastewrapper">
-		<div class="download"><a id="dlfile" href=""><p></p></a><a id="viewrawfile" href=""><p></p></a></div>
-		<pre><code></code></pre>
+		<div class="header noselect">
+			<div class="hlinks">
+				<a id="dlfile" href="">
+					<p>Download file</p>
+				</a>
+				<a id="viewrawfile" href="">
+					<p>View file</p>
+				</a>
+			</div>
+			<div class="fixeddiv">
+				<input id="fixedcb" type="checkbox">
+				<label for="fixedcb">Fixed header</label>
+			</div>
+		</div>
+		<div class="content">
+			<pre><code></code></pre>
+		</div>
 		<div class="loadspinner">
 			<div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 		</div>
 	</div>
 	<script src="/assets/external/js/jquery-3.2.1.min.js"></script>
+	<script src="/assets/external/js/js-cookie.js"></script>
 	<script src="/assets/external/js/highlight.min.js"></script>
 	<script src="/assets/external/js/highlightjs-line-numbers.min.js"></script>
 	<script src="/assets/js/global.js"></script>

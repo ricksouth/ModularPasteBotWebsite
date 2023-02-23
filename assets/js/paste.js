@@ -2,19 +2,28 @@ $(document).ready(function(e) {
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
 
+	const raw = urlParams.get('raw');
 	const url = urlParams.get('content');
 	if (!url.startsWith("https://cdn.discordapp.com/attachments/")) {
 		return;
 	}
 
-	const raw = urlParams.get('raw');
+	let fixedheader = Cookies.get('fixedheader');
+	if (fixedheader !== undefined) {
+		if (fixedheader === 'true') {
+			$(".pastewrapper").addClass("fixed");
+			$("#fixedcb").prop('checked', true);
+		}
+	}
 
+	$("#dlfile").attr('href', url);
 	if (raw !== "true") {
-		$("#dlfile").html("<p>Download file</p>").attr('href', url);
-		$("#viewrawfile").html("<p>View raw file</p>").attr('href', 'https://paste.modularity.gg/paste?content=' + url + '&raw=true');
+
+		$("#viewrawfile").html("<p>View raw file</p>").attr('href', '/paste?content=' + url + '&raw=true');
 		loadPasteData(url, false);
 	}
 	else {
+		$("#viewrawfile").html("<p>View formatted file</p>").attr('href', '/paste?content=' + url + '&raw=false');
 		loadPasteData(url, true);
 	}
 });
@@ -28,6 +37,17 @@ $(document).on('mousedown', 'tr', function(e) {
 	$(this).addClass("selected");
 
 	window.history.replaceState(null, document.title, url + "#" + number);
+});
+
+$(document).on('change', '#fixedcb', function() {
+	let checked = $(this).is(":checked");
+	if (checked) {
+		$(".pastewrapper").addClass("fixed");
+	}
+	else {
+		$(".pastewrapper").removeClass("fixed");
+	}
+	Cookies.set('fixedheader', checked, { expires: 365 });
 });
 
 function loadPasteData(url, israw) {
@@ -52,7 +72,8 @@ function loadPasteData(url, israw) {
 			} catch (e) { }
 
 			if (israw) {
-				$("body").addClass("raw").html('<div class="download"><a href="' + url + '"><p>Download file</p></a><a href="' + window.location.href.replaceAll("&raw=true", "&raw=false") + '"><p>View formatted file</p></a></div><div id="rawframe"><pre>' + content + '</pre></div>');
+				$("body").addClass("raw");
+				$(".content").html('<div id="rawframe"><pre>' + content + '</pre></div>');
 				return;
 			}
 
@@ -86,6 +107,16 @@ function loadPasteData(url, israw) {
 			}, 10);
 		},
 		error: function(data) {
+			$(".loadspinner").hide();
+
+			let notfoundcontent = '<div class="notfound"><pre><p>File not available.</p><p>Paste files are kept for up to 7 days with your privacy in mind.</p></pre></div>';
+			if (israw) {
+				$("body").addClass("raw");
+				$(".content").html('<div id="rawframe">' + notfoundcontent + '</div>');
+			}
+			else {
+				$(".content").html(notfoundcontent);
+			}
 		}
 	});
 }
