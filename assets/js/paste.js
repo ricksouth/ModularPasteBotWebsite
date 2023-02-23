@@ -238,11 +238,15 @@ function doExtraProcessing(identifier) {
 			else if (rowhtml.includes("/WARN")) {
 				lineclass = "warning"
 			}
-			else if (rowhtml.includes("/ERROR")) {
+			else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash")) {
 				lineclass = "error"
 			}
 		}
 
+		if (rowoutput.includes("]:")) {
+			let rhspl = rowoutput.split("]:", 2);
+			rowoutput = rhspl[0] + "]:" + "</span><span>" + rhspl[1];
+		}
 		row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
 	});
 }
