@@ -101,6 +101,7 @@ function loadPasteData(url, israw) {
 				celem.html(celem.html() + '<pre><code id="C' + i + '"></code></pre>');
 			}
 
+			let wenttoline = false;
 			let l = 1;
 			let n = 0;
 			let m = 0;
@@ -133,6 +134,27 @@ function loadPasteData(url, israw) {
 						doExtraProcessing(o, extraprocessing);
 
 						$(".loadspinner").hide();
+
+						if (wenttoline === false) {
+							let fullurl = window.location.href;
+							if (fullurl.includes("#")) {
+								let linenumber = fullurl.substring(fullurl.lastIndexOf("#") + 1, fullurl.length);
+								if (isNumeric(linenumber)) {
+									let lineint = parseInt(linenumber);
+									if (lineint < (o * 1000)) {
+										wenttoline = true;
+
+										let rows = $("table tr");
+
+										if (rows.length >= lineint) {
+											let selectedrow = $(rows[lineint - 1]);
+											selectedrow.addClass("selected");
+											selectedrow.get(0).scrollIntoView({behavior: 'smooth'});
+										}
+									}
+								}
+							}
+						}
 					}, 10);
 
 					n  = 0;
@@ -144,23 +166,6 @@ function loadPasteData(url, israw) {
 
 				l += 1;
 				n += 1;
-			}
-
-			let fullurl = window.location.href;
-			if (fullurl.includes("#")) {
-				let linenumber = fullurl.substring(fullurl.lastIndexOf("#") + 1, fullurl.length);
-				if (isNumeric(linenumber)) {
-					let lineint = parseInt(linenumber);
-					setTimeout( function() {
-						let rows = $("table tr");
-
-						if (rows.length >= lineint) {
-							let selectedrow = $(rows[lineint-1]);
-							selectedrow.addClass("selected");
-							selectedrow.get(0).scrollIntoView({behavior: 'smooth'});
-						}
-					}, 10);
-				}
 			}
 
 			setTimeout( function() {
@@ -207,11 +212,11 @@ function doExtraProcessing(count, identifier) {
 					line1 = line0;
 				}
 
-				let linesuffix = line1.split("(")[1].replace(")", "")
+				let linesuffix = line1.split("(")[1].replace(")", "").split("[")[0]
 				if (linesuffix.includes(":")) {
-					linesuffix = "<span class=\"at_line\">L" + linesuffix.split(":")[1] + "</span>"
+					linesuffix = "<span class=\"at_line\">L" + linesuffix.split(":")[1].trim() + "</span>"
 				} else {
-					linesuffix = "<span class=\"at_line\">" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
+					linesuffix = "<span class=\"at_line\">" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase().trim() + "</span>"
 				}
 
 				let ppackage = ""
@@ -289,16 +294,42 @@ function doExtraProcessing(count, identifier) {
 							let mainclass = ""
 							let ffunction = ""
 							let lsuffix = "";
+							let mixinsuffix = "";
 
 							if (word.includes("(")) {
 								let wspl = word.split("(");
 								word = wspl[0];
 
 								let linesuffix = wspl[1].replace(")", "")
+
+								if (linesuffix.includes(" ~")) {
+									let wigglesplit = linesuffix.split(" ~")
+									linesuffix = wigglesplit[0];
+
+									let mixinstuff = wigglesplit[1];
+									if (mixinstuff.includes(":mixin:APP:")) {
+										mixinsuffix = " ~[";
+										for (let mss of mixinstuff.split(":mixin:APP:")) {
+											if (mss.includes("?:?")) {
+												continue;
+											}
+
+											if (mixinsuffix !== " ~[") {
+												mixinsuffix += ", ";
+											}
+
+											mixinsuffix += mss.split(",pl")[0];
+										}
+										mixinsuffix += "]";
+									}
+								}
+
+								linesuffix = linesuffix.split("[")[0];
+
 								if (linesuffix.includes(":")) {
-									lsuffix = "<span class=\"at_line\">:L" + linesuffix.split(":")[1] + "</span>"
+									lsuffix = "<span class=\"at_line\">:L" + linesuffix.split(":")[1].trim() + "</span>"
 								} else {
-									lsuffix = "<span class=\"at_line\">:" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
+									lsuffix = "<span class=\"at_line\">:" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase().trim() + "</span>"
 								}
 							}
 
@@ -328,7 +359,7 @@ function doExtraProcessing(count, identifier) {
 							}
 
 							if (ppackage !== "" && mainclass !== "") {
-								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + lsuffix + "</span>";
+								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + lsuffix + mixinsuffix + "</span>";
 								customoutput += newword;
 								changed = true;
 								continue;
@@ -367,7 +398,7 @@ function doExtraProcessing(count, identifier) {
 		});
 	}
 	else {
-		$(".content table tr .hljs-ln-code").each(function (e) {
+		$("code#C" + count + " table tr .hljs-ln-code").each(function (e) {
 			let row = $(this);
 			let rowhtml = row.html();
 			let newrowhtml = rowhtml;
