@@ -4,7 +4,18 @@ $(document).ready(function(e) {
 
 	const raw = urlParams.get('raw');
 	const url = urlParams.get('content');
-	if (!url.startsWith("https://cdn.discordapp.com/attachments/")) {
+	if (url == null || !url.startsWith("https://cdn.discordapp.com/attachments/")) {
+		if (raw === "true") {
+			displayFileNotFound(true);
+			$("#viewrawfile p").html("View formatted file");
+		}
+		else {
+			displayFileNotFound(false);
+			$("#viewrawfile p").html("View raw file");
+		}
+
+		$("#viewrawfile").attr('href', '#');
+		$("#dlfile").attr('href', '#');
 		return;
 	}
 
@@ -84,19 +95,56 @@ function loadPasteData(url, israw) {
 				return;
 			}
 
-			const celem = $(".pastewrapper code");
-			celem.html(content);
-
-			let extraprocessing = "";
-			if (content.includes("Minecraft")) {
-				$(".content pre code").addClass("hljs");
-				extraprocessing = "minecraft";
-			}
-			else {
-				hljs.highlightAll();
+			let celem = $(".pastewrapper .content");
+			let count = (content.match(/\n/g) || '').length;
+			for (let i = 0; i < Math.ceil(count/1000); i++) {
+				celem.html(celem.html() + '<pre><code id="C' + i + '"></code></pre>');
 			}
 
-			hljs.initLineNumbersOnLoad();
+			let l = 1;
+			let n = 0;
+			let m = 0;
+			let lines = "";
+			for (let line of content.split("\n")) {
+				if (lines !== "") {
+					lines += "\n";
+				}
+				lines += line;
+
+				if (n >= 999 || l === count) {
+					const codeelem = $(".pastewrapper .content pre code")[m];
+					$(codeelem).html(escapeHtml(lines));
+
+					let extraprocessing = "";
+					if (content.includes("Minecraft")) {
+						$(codeelem).addClass("hljs");
+						extraprocessing = "minecraft";
+					}
+					else {
+						hljs.highlightElement(codeelem);
+					}
+
+					hljs.lineNumbersBlock(codeelem, {
+						startFrom: l-n
+					});
+
+					const o = m;
+					window['to' + o] = setTimeout( function() {
+						doExtraProcessing(o, extraprocessing);
+
+						$(".loadspinner").hide();
+					}, 10);
+
+					n  = 0;
+					m += 1;
+					l += 1;
+					lines = "";
+					continue;
+				}
+
+				l += 1;
+				n += 1;
+			}
 
 			let fullurl = window.location.href;
 			if (fullurl.includes("#")) {
@@ -105,7 +153,6 @@ function loadPasteData(url, israw) {
 					let lineint = parseInt(linenumber);
 					setTimeout( function() {
 						let rows = $("table tr");
-						console.log(rows);
 
 						if (rows.length >= lineint) {
 							let selectedrow = $(rows[lineint-1]);
@@ -117,37 +164,26 @@ function loadPasteData(url, israw) {
 			}
 
 			setTimeout( function() {
-				doExtraProcessing(extraprocessing);
-
 				setMaxWidthLineNumbers();
-				$(".loadspinner").hide();
-			}, 10);
+			}, 20);
+
 		},
 		error: function(data) {
-			$(".loadspinner").hide();
-
-			let notfoundcontent = '<div class="notfound"><pre><p>File not available.</p><p>Paste files are kept for up to 7 days with your privacy in mind.</p></pre></div>';
-			if (israw) {
-				$("body").addClass("raw");
-				$(".content").html('<div id="rawframe">' + notfoundcontent + '</div>');
-			}
-			else {
-				$(".content").html(notfoundcontent);
-			}
+			displayFileNotFound(israw);
 		}
 	});
 }
 
-function doExtraProcessing(identifier) {
+function doExtraProcessing(count, identifier) {
 	if (identifier === "minecraft") {
-		$(".content table tr .hljs-ln-code").each(function (e) {
+		$("code#C" + count + " table tr .hljs-ln-code").each(function (e) {
 			let row = $(this);
 			let rowhtml = row.html();
 
 			let rowoutput = rowhtml;
 			let trimmedrow = rowhtml.trim();
 			if (trimmedrow.includes("]:")) {
-				trimmedrow = trimmedrow.split("]:")[1].trim();
+				trimmedrow = trimmedrow.split("]:", 2)[1].trim();
 			}
 
 			let lineclass = "info";
@@ -232,11 +268,39 @@ function doExtraProcessing(identifier) {
 					if (customoutput !== "") {
 						customoutput += " ";
 					}
-					if (!word.includes(".jar") && !word.includes(".txt") && !word.includes(".json")) {
+
+					if (word.endsWith(".jar")) {
+						changed = true;
+						customoutput += '<span class="jar">' + word + '</span>';
+						continue;
+					}
+
+					let allgood = true;
+					for (let ifs of [".txt", "json"]) {
+						if (word.includes(ifs) && ! word.includes(ifs + ".")) {
+							allgood = false;
+							break;
+						}
+					}
+
+					if (allgood) {
 						if ((word.match(/\./g) || []).length >= 2) {
 							let ppackage = ""
 							let mainclass = ""
 							let ffunction = ""
+							let lsuffix = "";
+
+							if (word.includes("(")) {
+								let wspl = word.split("(");
+								word = wspl[0];
+
+								let linesuffix = wspl[1].replace(")", "")
+								if (linesuffix.includes(":")) {
+									lsuffix = "<span class=\"at_line\">:L" + linesuffix.split(":")[1] + "</span>"
+								} else {
+									lsuffix = "<span class=\"at_line\">:" + linesuffix.split(" ")[0].replaceAll(".", "").toLowerCase() + "</span>"
+								}
+							}
 
 							for (let seg of word.split(".")) {
 								if (seg.length === 0) {
@@ -264,7 +328,7 @@ function doExtraProcessing(identifier) {
 							}
 
 							if (ppackage !== "" && mainclass !== "") {
-								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + "</span>";
+								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + lsuffix + "</span>";
 								customoutput += newword;
 								changed = true;
 								continue;
@@ -280,17 +344,24 @@ function doExtraProcessing(identifier) {
 				}
 			}
 
-			if (rowhtml.includes("/INFO")) {
-				lineclass = "info"
-			} else if (rowhtml.includes("/WARN")) {
-				lineclass = "warning"
-			} else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
-				lineclass = "error"
-			}
+			if (lineclass === "info") {
+				if (rowhtml.includes("/INFO")) {
+					lineclass = "info"
+				} else if (rowhtml.includes("/WARN")) {
+					lineclass = "warning"
+				} else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
+					lineclass = "error"
+				}
 
-			if (rowoutput.includes("]:")) {
-				let rhspl = rowoutput.split("]:", 2);
-				rowoutput = rhspl[0] + "]:" + "</span><span>" + rhspl[1];
+				if (rowoutput.includes("]:")) {
+					if (rowhtml.includes("STDERR")) {
+						console.log(rowhtml);
+					}
+
+					const [first, ...rest] = rowoutput.split(']:')
+					const second = rest.join(']:')
+					rowoutput = first + ']:' + "</span><span>" + second;
+				}
 			}
 			row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
 		});
@@ -323,8 +394,7 @@ function setMaxWidthLineNumbers() {
 function checkHeaderWidth() {
 	let label = $(".fixeddiv label");
 	let position = label.position();
-	let width = 87; // label.width();
-	console.log(width);
+	let width = 87;
 	let rightside = position.left + width + 5;
 
 	if (rightside > $(window).width()) {
@@ -335,6 +405,19 @@ function checkHeaderWidth() {
 	}
 }
 
+function displayFileNotFound(israw) {
+	$(".loadspinner").hide();
+
+	let notfoundcontent = '<div class="notfound"><pre><p>File not available.</p><p>Paste files are kept for up to 7 days with your privacy in mind.</p></pre></div>';
+	if (israw) {
+		$("body").addClass("raw");
+		$(".content").html('<div id="rawframe">' + notfoundcontent + '</div>');
+	}
+	else {
+		$(".content").html(notfoundcontent);
+	}
+}
+
 function getUrlPrefix() {
 	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy9wYXN0ZS8=");
 }
@@ -342,3 +425,12 @@ function getUrlPrefix() {
 function isNumeric(value) {
 	return /^\d+$/.test(value);
 }
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }

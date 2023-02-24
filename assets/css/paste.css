@@ -1,6 +1,9 @@
 body {
     margin: 0;
 }
+body pre {
+    margin: 0;
+}
 
 body:not(.raw) .pastewrapper.fixed .header {
     background-color: #313338;
@@ -8,7 +11,7 @@ body:not(.raw) .pastewrapper.fixed .header {
 body:not(.raw) .pastewrapper .header .fixeddiv {
     border-left: 2px solid white;
 }
-body:not(.raw) .pastewrapper.fixed pre {
+body:not(.raw) .pastewrapper.fixed .content {
     margin-top: 55px;
 }
 body:not(.raw) .notfound pre {
@@ -37,6 +40,9 @@ body.raw .notfound {
 }
 .pastewrapper.fixed .header {
     position: fixed !important;
+}
+.pastewrapper .content {
+    margin-top: 10px;
 }
 
 body.raw #rawframe {
@@ -176,6 +182,9 @@ pre code tbody tr.selected {
 }
 .hljs-ln-code span.error span {
     color: #D13F0F !important;
+}
+.hljs-ln-code span.jar {
+    color: #229c22;
 }
 
 .hljs-ln-code span.at_at {
