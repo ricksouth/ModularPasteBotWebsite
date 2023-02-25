@@ -299,12 +299,14 @@ body.darkmode .hljs-ln-code span.info { color: #D3D3D3; }
 body:not(.darkmode) .hljs-ln-code span.info { color: #696969; }
 body.darkmode .hljs-ln-code span.warning { color: #E9D502; }
 body:not(.darkmode) .hljs-ln-code span.warning { color: #deb900; }
-body.darkmode .hljs-ln-code span.error { color: #D13F0F !important; }
-body:not(.darkmode) .hljs-ln-code span.error { color: #D13F0F !important; }
-body.darkmode .hljs-ln-code span.error span { color: #D13F0F !important; }
-body:not(.darkmode) .hljs-ln-code span.error span { color: #D13F0F !important; }
+body.darkmode .hljs-ln-code span.error { color: #D13F0F; }
+body:not(.darkmode) .hljs-ln-code span.error { color: #D13F0F; }
+body.darkmode .hljs-ln-code span.error span { color: #D13F0F; }
+body:not(.darkmode) .hljs-ln-code span.error span { color: #D13F0F; }
 body.darkmode .hljs-ln-code span.jar { color: #229c22; }
 body:not(.darkmode) .hljs-ln-code span.jar { color: #229c22; }
+body.darkmode .hljs-ln-code span.simsver { color: #229c22 !important; }
+body:not(.darkmode) .hljs-ln-code span.simsver { color: #229c22 !important; }
 
 body.darkmode .hljs-ln-code .at_package { color: #E5C07B; }
 body:not(.darkmode) .hljs-ln-code .at_package { color: #875900; }

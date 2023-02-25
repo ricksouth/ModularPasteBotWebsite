@@ -73,9 +73,6 @@ const tooltipdescriptions = { "download" : "Download file", "raw" : "View raw fi
 $(".header img").on({
     mouseenter: function () {
 		if (!$("body").hasClass("toggletooltip") || /Mobi|Android/i.test(navigator.userAgent)) {
-			if ($(".tooltip").is(":visible")) {
-				$(".tooltip").hide();
-			}
 			return;
 		}
 
@@ -134,6 +131,14 @@ function loadPasteData(url, israw) {
 				return;
 			}
 
+			let extraprocessing = "";
+			if (content.includes("Minecraft") || content.includes(".minecraft")) {
+				extraprocessing = "minecraft";
+			}
+			else if (content.includes("sims4")) {
+				extraprocessing = "sims";
+			}
+
 			let celem = $(".pastewrapper .content");
 			let count = (content.match(/\n/g) || '').length;
 			for (let i = 0; i < Math.ceil(count/1000); i++) {
@@ -153,12 +158,15 @@ function loadPasteData(url, israw) {
 
 				if (n >= 999 || l === count) {
 					const codeelem = $(".pastewrapper .content pre code")[m];
-					$(codeelem).html(escapeHtml(lines));
 
-					let extraprocessing = "";
-					if (content.includes("Minecraft")) {
+					if (!content.startsWith("<?xml version")) {
+						lines = escapeHtml(lines);
+					}
+
+					$(codeelem).html(lines);
+
+					if (extraprocessing !== "") {
 						$(codeelem).addClass("hljs");
-						extraprocessing = "minecraft";
 					}
 					else {
 						hljs.highlightElement(codeelem);
@@ -416,7 +424,7 @@ function doExtraProcessing(count, identifier) {
 								ffunction = mcspl[1];
 							}
 
-							if (ppackage !== "" && mainclass !== "") {
+							if (ppackage !== "" && mainclass !== "" && !mainclass.includes("]:")) {
 								let newword = "<span class=\"at_package\">" + ppackage + "</span>" + "<span class=\"at_mainclass\">" + mainclass + "</span>" + "<span class=\"at_function\">" + ffunction + lsuffix + mixinsuffix + "</span>";
 								customoutput += newword;
 								changed = true;
@@ -443,10 +451,6 @@ function doExtraProcessing(count, identifier) {
 				}
 
 				if (rowoutput.includes("]:")) {
-					if (rowhtml.includes("STDERR")) {
-						console.log(rowhtml);
-					}
-
 					const [first, ...rest] = rowoutput.split(']:')
 					const second = rest.join(']:')
 					rowoutput = first + ']:' + "</span><span>" + second;
@@ -454,6 +458,28 @@ function doExtraProcessing(count, identifier) {
 			}
 			row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
 		});
+	}
+	else if (identifier === "sims") {
+		$("code#C" + count + " table tr .hljs-ln-code").each(function (e) {
+			let row = $(this);
+			let rowhtml = row.html();
+			let newrowhtml = rowhtml;
+
+			let regextest = rowhtml.match(/\d+\.\d\d\.\d+\.\d+/);
+			if (regextest != null) {
+				let gameversion = regextest[0];
+				rowhtml = rowhtml.replace(gameversion, '<span class="simsver">' + gameversion + '</span>');
+			}
+
+			if (rowhtml.includes("Error") || rowhtml.includes("Exception")) {
+				newrowhtml = '<span class="error">' + rowhtml + '</span>';
+			}
+
+			if (rowhtml !== newrowhtml) {
+				row.html(newrowhtml);
+			}
+		});
+		// \d+\.\d\d\.\d+\.\d+
 	}
 	else {
 		$("code#C" + count + " table tr .hljs-ln-code").each(function (e) {
@@ -502,6 +528,11 @@ $(document).on('change', '.header input', function() {
 	}
 
 	let checked = inputelem.is(":checked");
+	if (id === "toggletooltip" && !checked) {
+		if ($(".tooltip").is(":visible")) {
+			$(".tooltip").hide();
+		}
+	}
 
 	let israw = $("body").hasClass("raw");
 	let cookieprefix = "";
