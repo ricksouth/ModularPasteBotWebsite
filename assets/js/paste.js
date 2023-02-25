@@ -553,6 +553,10 @@ function loadHeaderSettings(initial, israw) {
 	$(".header input").each(function(e) {
 		let inputelem = $(this);
 		let id = inputelem.attr('id');
+		if (id === "scroll") {
+			return true;
+		}
+
 		let imgname = inputelem.attr('value');
 		let checked = Cookies.get(cookieprefix + id) !== 'false';
 
