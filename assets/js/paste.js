@@ -2,16 +2,18 @@ $(document).ready(function(e) {
 	const queryString = window.location.search;
 	const urlParams = new URLSearchParams(queryString);
 
-	const raw = urlParams.get('raw');
 	const url = urlParams.get('content');
+	const raw = urlParams.get('raw');
+	let israw = raw === "true";
+
 	if (url == null || !url.startsWith("https://cdn.discordapp.com/attachments/")) {
-		if (raw === "true") {
+		if (israw) {
 			displayFileNotFound(true);
-			$("#viewrawfile p").html("View formatted file");
+			$("#viewrawfile img").attr('src', '/assets/images/header/formatted.svg');
 		}
 		else {
 			displayFileNotFound(false);
-			$("#viewrawfile p").html("View raw file");
+			$("#viewrawfile img").attr('src', '/assets/images/header/raw.svg');
 		}
 
 		$("#viewrawfile").attr('href', '#');
@@ -19,26 +21,20 @@ $(document).ready(function(e) {
 		return;
 	}
 
-	let fixedheader = Cookies.get('fixedheader');
-	if (fixedheader !== undefined) {
-		if (fixedheader === 'true') {
-			$(".pastewrapper").addClass("fixed");
-			$("#fixedcb").prop('checked', true);
-		}
-	}
-
 	$("#dlfile").attr('href', url);
 	if (raw !== "true") {
 
-		$("#viewrawfile").html("<p>View raw file</p>").attr('href', '/paste?content=' + url + '&raw=true');
+		$("#viewrawfile").attr('href', '/paste?content=' + url + '&raw=true');
+		$("#viewrawfile img").attr('src', '/assets/images/header/raw.svg');
 		loadPasteData(url, false);
 	}
 	else {
-		$("#viewrawfile").html("<p>View formatted file</p>").attr('href', '/paste?content=' + url + '&raw=false');
+		$("#viewrawfile").attr('href', '/paste?content=' + url + '&raw=false');
+		$("#viewrawfile img").attr('src', '/assets/images/header/formatted.svg');
 		loadPasteData(url, true);
 	}
 
-	checkHeaderWidth();
+	loadHeaderSettings(true, israw);
 });
 
 $(document).on('mousedown', 'tr', function(e) {
@@ -50,21 +46,6 @@ $(document).on('mousedown', 'tr', function(e) {
 	$(this).addClass("selected");
 
 	window.history.replaceState(null, document.title, url + "#" + number);
-});
-
-$(document).on('change', '#fixedcb', function() {
-	let checked = $(this).is(":checked");
-	if (checked) {
-		$(".pastewrapper").addClass("fixed");
-	}
-	else {
-		$(".pastewrapper").removeClass("fixed");
-	}
-	Cookies.set('fixedheader', checked, { expires: 365 });
-});
-
-$(window).on('resize', function(e) {
-	checkHeaderWidth();
 });
 
 function loadPasteData(url, israw) {
@@ -134,6 +115,25 @@ function loadPasteData(url, israw) {
 						doExtraProcessing(o, extraprocessing);
 
 						$(".loadspinner").hide();
+
+						if (o === m-1) {
+							let maxwidth = 0;
+							$(".pastewrapper pre table").each(function(e) {
+								let width = $(this).width();
+								if (width > maxwidth) {
+									maxwidth = width;
+								}
+							});
+
+							$('<style id="maxwidthstyle" type="text/css"> .maxwidth { width: ' + maxwidth + 'px !important; } </style>').appendTo("head");
+
+							if ($("#wraptextimg").attr('src').includes("_disabled")) {
+								$(".pastewrapper pre table").addClass("maxwidth");
+							}
+							else {
+								$("body").addClass("wraptext");
+							}
+						}
 
 						if (wenttoline === false) {
 							let fullurl = window.location.href;
@@ -422,20 +422,6 @@ function setMaxWidthLineNumbers() {
 	$(".hljs-ln-numbers").attr('style', 'width: ' + width + 'px;')
 }
 
-function checkHeaderWidth() {
-	let label = $(".fixeddiv label");
-	let position = label.position();
-	let width = 87;
-	let rightside = position.left + width + 5;
-
-	if (rightside > $(window).width()) {
-		label.html("FH");
-	}
-	else {
-		label.html("Fixed Header");
-	}
-}
-
 function displayFileNotFound(israw) {
 	$(".loadspinner").hide();
 
@@ -449,6 +435,63 @@ function displayFileNotFound(israw) {
 	}
 }
 
+/* Header Functions */
+$(document).on('change', '.header input', function() {
+	let inputelem = $(this);
+	let id = inputelem.attr('id');
+	let checked = inputelem.is(":checked");
+
+	let israw = $("body").hasClass("raw");
+	let cookieprefix = "";
+	if (israw) {
+		cookieprefix = "raw_";
+	}
+
+	Cookies.set(cookieprefix + id, checked, { expires: 365, secure: true, sameSite: 'lax' });
+	loadHeaderSettings(false, israw);
+});
+
+function loadHeaderSettings(initial, israw) {
+	let cookieprefix = "";
+	if (israw) {
+		cookieprefix = "raw_";
+	}
+
+	$(".header input").each(function(e) {
+		let inputelem = $(this);
+		let id = inputelem.attr('id');
+		let imgname = inputelem.attr('value');
+		let checked = Cookies.get(cookieprefix + id) !== 'false';
+
+		let src = '/assets/images/header/' + imgname + '.svg';
+		if (!checked) {
+			src = src.replace(".svg", "_disabled.svg");
+			$("body").removeClass(id);
+
+			if (id === "wraptext" && !initial && !israw) {
+				$(".pastewrapper pre table").addClass("maxwidth");
+			}
+		}
+		else {
+			if (!(id === "wraptext" && initial && !israw)) {
+				$("body").addClass(id);
+			}
+
+			if (id === "wraptext" && !initial && !israw) {
+				$(".pastewrapper pre table").removeClass("maxwidth");
+			}
+		}
+		$("#" + id + "img").attr('src', src);
+
+		inputelem.prop('checked', checked);
+
+		if (!initial) {
+			Cookies.set(cookieprefix + id, checked, {expires: 365, secure: true, sameSite: 'lax'});
+		}
+	});
+}
+
+/* Utility Functions */
 function getUrlPrefix() {
 	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy9wYXN0ZS8=");
 }

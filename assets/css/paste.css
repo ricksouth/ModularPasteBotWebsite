@@ -5,30 +5,114 @@ body pre {
     margin: 0;
 }
 
-body:not(.raw) .pastewrapper.fixed .header {
+body.darkmode {
     background-color: #313338;
+    color: white;
 }
-body:not(.raw) .pastewrapper .header .fixeddiv {
+body.darkmode .pastewrapper,
+body.darkmode .pastewrapper .header {
+    background-color: #313338;
+    color: white;
+}
+body.darkmode .hljs {
+    color: white;
+}
+body.darkmode .header img {
+    filter: invert(100%) sepia(0%) saturate(4752%) hue-rotate(213deg) brightness(112%) contrast(105%);
+}
+body.darkmode .header img:hover {
+    filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
+}
+body.darkmode .pastewrapper .header .pindiv {
     border-left: 2px solid white;
 }
-body:not(.raw) .pastewrapper.fixed .content {
-    margin-top: 55px;
+body.darkmode pre code tbody tr:nth-child(odd) {
+    background-color: #313338;
+}
+body.darkmode pre code tbody tr:nth-child(even) {
+    background-color: #373a40;
+}
+body.darkmode pre code tbody tr:hover,
+body.darkmode pre code tbody tr.selected {
+    background-color: #444536 !important;
+}
+body.darkmode .hljs-ln-numbers {
+    color: #ccc;
+    border-right: 1px solid #CCC;
+}
+body.darkmode .header {
+    color: #ccc;
+    border-bottom: 2px solid #ccc;
+}
+body.darkmode .header a {
+    color: #ccc;
+}
+body.darkmode #rawframe {
+    color: white;
+}
+
+
+body:not(.darkmode) .darkmode {
+    background-color: white !important;
+    color: black;
+}
+body:not(.darkmode) .pastewrapper,
+body:not(.darkmode) .pastewrapper .header {
+    background-color: white !important;
+    color: black;
+}
+body:not(.darkmode) .hljs {
+    color: black;
+}
+body:not(.darkmode) .header img:hover {
+    filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
+}
+body:not(.darkmode) .pastewrapper .header .pindiv {
+    border-left: 2px solid black;
+}
+body:not(.darkmode) pre code tbody tr:nth-child(odd) {
+    background-color: white;
+}
+body:not(.darkmode) pre code tbody tr:nth-child(even) {
+    background-color: #e1e3e8;
+}
+body:not(.darkmode) pre code tbody tr:hover,
+body:not(.darkmode) pre code tbody tr.selected {
+    background-color: #fafad9 !important;
+}
+body:not(.darkmode) .hljs-ln-numbers {
+    color: #5e5e5e;
+    border-right: 1px solid #5e5e5e;
+}
+body:not(.darkmode) .header {
+    color: black;
+    border-bottom: 2px solid black;
+}
+body:not(.darkmode) .header a {
+    color: black;
+}
+body:not(.darkmode) #rawframe {
+    color: black;
+}
+
+
+
+body:not(.wraptext) .pastewrapper {
+    overflow: scroll;
+}
+body.wraptext .pastewrapper {
+    overflow-y: scroll !important;
+}
+
+body.pinheader:not(.raw) .pastewrapper .content {
+    margin-top: 62px;
 }
 body:not(.raw) .notfound pre {
     margin-left: 10px;
 }
 
-body.raw {
-    background-color: white !important;
-}
-body.raw .pastewrapper.fixed .header {
-    background-color: white !important;
-}
-body.raw .pastewrapper .header .fixeddiv {
-    border-left: 2px solid black;
-}
-body.raw .pastewrapper.fixed pre {
-    margin-top: 13px;
+body.pinheader.raw .pastewrapper pre {
+    margin-top: 0;
 }
 body.raw .notfound {
     margin-top: -10px;
@@ -38,23 +122,26 @@ body.raw .notfound {
     width: 100vw;
     overflow: hidden;
 }
-.pastewrapper.fixed .header {
+body.pinheader .pastewrapper .header {
     position: fixed !important;
 }
 .pastewrapper .content {
     margin-top: 10px;
+    height: calc(100vh - 62px);
+}
+.pastewrapper .content pre:last-child code {
+    margin-bottom: 30px;
 }
 
 body.raw #rawframe {
     position: absolute;
-    top: 40px;
+    top: 60px;
     left: 0;
     width: calc(100% - 20px);
     height: calc(100% - 60px);
 
     padding: 10px;
 
-    color: black;
     border: none;
     white-space: pre-wrap;
 }
@@ -65,9 +152,9 @@ body.raw #rawframe {
     top: 0;
     left: 0;
 
-    padding: 10px 0 10px 0;
-    height: 20px;
-    width: 100vw;
+    padding: 5px 5px 5px 5px;
+    height: 40px;
+    width: calc(100vw - 10px);
 
     text-align: left;
     overflow: visible;
@@ -75,7 +162,8 @@ body.raw #rawframe {
 }
 .header div {
     display: inline-block;
-    height: 20px;
+    height: 40px;
+    margin-left: 5px;
 }
 .header a {
     text-decoration: none;
@@ -84,6 +172,18 @@ body.raw #rawframe {
     display: inline-block;
     margin: 0 0 0 10px;
 }
+.header input {
+    position: absolute;
+    height: 40px;
+    opacity: 0;
+}
+.header img {
+    display: inline-block;
+    height: 40px;
+}
+.header img:hover {
+    cursor: pointer;
+}
 .header .hlinks p {
     text-decoration: underline;
 }
@@ -91,40 +191,42 @@ body.raw #rawframe {
     text-decoration: none;
 }
 
-.header .fixeddiv {
+.header .pindiv {
     margin-left: 10px;
+    padding-left: 15px;
 }
-.header .fixeddiv input {
-    margin-left: 18px;
-}
-.header .fixeddiv p {
+.header .pindiv p {
     margin-left: 2px;
 }
 
-body.raw .header {
-    color: black;
-    border-bottom: 2px solid black;
+body.raw pre {
+    margin-bottom: 30px;
 }
-body.raw .header a {
-    color: black;
-}
-body:not(.raw) .header {
-    color: #ccc;
-    border-bottom: 2px solid #ccc;
-}
-body:not(.raw) .header a {
-    color: #ccc;
-}
-
 pre code {
     width: 100%;
     padding: 0 !important;
     background-color: rgb(0, 0, 0, 0) !important;
+}
+body.wraptext pre code {
     word-wrap: anywhere !important;
     overflow: hidden !important;
 }
+body.wraptext #rawframe {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word;
+}
+body.wraptext #rawframe pre {
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+body:not(.wraptext) pre code {
+    word-wrap: normal !important;
+    overflow: visible !important;
+}
 
-pre code span {
+body.wraptext pre code span {
     white-space: pre-wrap !important;
 }
 
@@ -139,13 +241,6 @@ pre code table {
 pre code tbody tr {
     white-space: nowrap;
 }
-pre code tbody tr:nth-child(even) {
-    background-color: #373a40 !important;
-}
-pre code tbody tr:hover,
-pre code tbody tr.selected {
-    background-color: #444536 !important;
-}
 
 .hljs-ln-numbers {
     -webkit-touch-callout: none;
@@ -156,8 +251,6 @@ pre code tbody tr.selected {
     user-select: none;
 
     text-align: center;
-    color: #ccc;
-    border-right: 1px solid #CCC;
     vertical-align: top;
     padding-right: 5px;
 }
@@ -170,21 +263,10 @@ pre code tbody tr.selected {
     padding: 0 10px 0 10px !important;
     white-space: pre !important;
 }
-
-.hljs-ln-code span.info {
-	color: #D3D3D3;
+body.wraptext .hljs-ln-code {
 }
-.hljs-ln-code span.warning {
-	color: #E9D502;
-}
-.hljs-ln-code span.error {
-	color: #D13F0F !important;
-}
-.hljs-ln-code span.error span {
-    color: #D13F0F !important;
-}
-.hljs-ln-code span.jar {
-    color: #229c22;
+body:not(.wraptext) .hljs-ln-code {
+    overflow: visible !important;
 }
 
 .hljs-ln-code span.at_at {
@@ -192,15 +274,33 @@ pre code tbody tr.selected {
 	filter: brightness(0.9);
 }
 
-.hljs-ln-code .at_package {
-	color: #E5C07B;
+body:not(.darkmode) .hljs-ln-code span.info,
+body:not(.darkmode) .hljs-ln-code span.warning,
+body:not(.darkmode) .hljs-ln-code span.error,
+body:not(.darkmode) .hljs-ln-code span.jar,
+body:not(.darkmode) .hljs-ln-code .at_package,
+body:not(.darkmode) .hljs-ln-code .at_mainclass,
+body:not(.darkmode) .hljs-ln-code .at_function,
+body:not(.darkmode) .hljs-ln-code .at_line {
+    font-weight: bold;
 }
-.hljs-ln-code .at_mainclass {
-	color: #2AA198;
-}
-.hljs-ln-code .at_function {
-	color: #FB9522;
-}
-.hljs-ln-code .at_line {
-	color: #AC80FF;
-}
+
+body.darkmode .hljs-ln-code span.info { color: #D3D3D3; }
+body:not(.darkmode) .hljs-ln-code span.info { color: #696969; }
+body.darkmode .hljs-ln-code span.warning { color: #E9D502; }
+body:not(.darkmode) .hljs-ln-code span.warning { color: #deb900; }
+body.darkmode .hljs-ln-code span.error { color: #D13F0F !important; }
+body:not(.darkmode) .hljs-ln-code span.error { color: #D13F0F !important; }
+body.darkmode .hljs-ln-code span.error span { color: #D13F0F !important; }
+body:not(.darkmode) .hljs-ln-code span.error span { color: #D13F0F !important; }
+body.darkmode .hljs-ln-code span.jar { color: #229c22; }
+body:not(.darkmode) .hljs-ln-code span.jar { color: #229c22; }
+
+body.darkmode .hljs-ln-code .at_package { color: #E5C07B; }
+body:not(.darkmode) .hljs-ln-code .at_package { color: #875900; }
+body.darkmode .hljs-ln-code .at_mainclass { color: #2AA198; }
+body:not(.darkmode) .hljs-ln-code .at_mainclass { color: #2AA198; }
+body.darkmode .hljs-ln-code .at_function { color: #FB9522; }
+body:not(.darkmode) .hljs-ln-code .at_function { color: #FB9522; }
+body.darkmode .hljs-ln-code .at_line { color: #AC80FF; }
+body:not(.darkmode) .hljs-ln-code .at_line { color: #AC80FF; }

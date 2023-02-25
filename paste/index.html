@@ -11,24 +11,32 @@
 	<title>Modular Paste</title>
 	<link rel="stylesheet" href="/assets/external/css/highlightjs/a11y-dark.min.css">
 	<link rel="stylesheet" href="/assets/css/global.css">
-	<link rel="stylesheet" href="/assets/css/paste.css">
+	<link rel="stylesheet" href="/assets/css/paste.css?=1">
 	<link rel="stylesheet" href="/assets/css/spinner.css">
 	<script async defer data-website-id="8a1f13f3-a121-4665-92a3-f56a2134c7d8" src="https://panel.ntmsdata.com/hello.js"></script>
 </head>
-<body>
+<body class="pinheader darkmode">
 	<div class="pastewrapper">
 		<div class="header noselect">
 			<div class="hlinks">
 				<a id="dlfile" href="">
-					<p>Download file</p>
+					<img alt="dl" src="/assets/images/header/download.svg">
 				</a>
 				<a id="viewrawfile" href="">
-					<p>View file</p>
+					<img alt="raw" src="/assets/images/header/loading.svg">
 				</a>
 			</div>
-			<div class="fixeddiv">
-				<input id="fixedcb" type="checkbox">
-				<label for="fixedcb">Fixed header</label>
+			<div class="pindiv">
+				<input id="pinheader" value="pin" type="checkbox">
+				<label for="pinheader"><img id="pinheaderimg" alt="pin" src="/assets/images/header/pin.svg"></label>
+			</div>
+			<div class="wrapdiv">
+				<input id="wraptext" value="wraptext" type="checkbox">
+				<label for="wraptext"><img id="wraptextimg" alt="wrap" src="/assets/images/header/wraptext.svg"></label>
+			</div>
+			<div class="lightdarkdiv">
+				<input id="darkmode" value="darkmode" type="checkbox">
+				<label for="darkmode"><img id="darkmodeimg" alt="darkmode" src="/assets/images/header/darkmode.svg"></label>
 			</div>
 		</div>
 		<div class="content"></div>
@@ -37,7 +45,8 @@
 		</div>
 	</div>
 	<script src="/assets/external/js/jquery-3.2.1.min.js"></script>
-	<script src="/assets/external/js/js-cookie.js"></script>
+	<script src="/assets/external/js/js-cookie.min.js"></script>
+	<script src="/assets/external/js/desvg.min.js"></script>
 	<script src="/assets/external/js/highlight.min.js"></script>
 	<script src="/assets/external/js/highlightjs-line-numbers.min.js"></script>
 	<script src="/assets/js/global.js"></script>

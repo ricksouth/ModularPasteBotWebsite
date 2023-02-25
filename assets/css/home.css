@@ -6,6 +6,8 @@
 
 body {
     overflow: hidden;
+    color: white;
+    background-color: #313338;
 }
 
 .wrapper {
