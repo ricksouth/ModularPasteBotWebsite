@@ -34,6 +34,10 @@ $(document).ready(function(e) {
 		loadPasteData(url, true);
 	}
 
+	if (/Mobi|Android/i.test(navigator.userAgent)) {
+		$(".toggletooltipdiv").hide();
+	}
+
 	loadHeaderSettings(true, israw);
 });
 
@@ -46,6 +50,60 @@ $(document).on('mousedown', 'tr', function(e) {
 	$(this).addClass("selected");
 
 	window.history.replaceState(null, document.title, url + "#" + number);
+});
+
+$(document).on('mousedown', '#scrollimg', function(e) {
+	let scrollimg = $(this);
+	let src = scrollimg.attr('src');
+
+	let rows = $(".content table tr");
+	if (src.includes("_disabled")) {
+		rows.get(0).scrollIntoView({behavior: 'smooth'});
+		src = src.replace("_disabled.svg", ".svg");
+	}
+	else {
+		rows.get(rows.length - 1).scrollIntoView({behavior: 'smooth'});
+		src = src.replace(".svg", "_disabled.svg");
+	}
+
+	scrollimg.attr('src', src);
+});
+
+const tooltipdescriptions = { "download" : "Download file", "raw" : "View raw file", "pinheader" : "Pin header to top of screen", "wraptext" : "Wrap text to fit screen", "darkmode" : "Toggle dark/light mode", "toggletooltip" : "Toggle header image tooltip visibility", "scroll" : "Scroll to bottom/top" };
+$(".header img").on({
+    mouseenter: function () {
+		if (!$("body").hasClass("toggletooltip") || /Mobi|Android/i.test(navigator.userAgent)) {
+			if ($(".tooltip").is(":visible")) {
+				$(".tooltip").hide();
+			}
+			return;
+		}
+
+		let id = $(this).attr('id').replace("img", "");
+		let description = tooltipdescriptions[id];
+
+		if (id === "raw" && $("body").hasClass("raw")) {
+			description = description.replace("raw", "formatted");
+		}
+
+		$(".tooltip p").html(description);
+        $(".tooltip").show();
+    },
+    mouseleave: function () {
+		if (!$("body").hasClass("toggletooltip")) {
+			return;
+		}
+
+        $(".tooltip").hide();
+    }
+});
+
+$(document).mousemove(function(e) {
+	if (!$("body").hasClass("toggletooltip")) {
+		return;
+	}
+
+	$(".tooltip").css('top', e.pageY+10 + 'px').css('left', e.pageX+10 + 'px');
 });
 
 function loadPasteData(url, israw) {
@@ -439,6 +497,10 @@ function displayFileNotFound(israw) {
 $(document).on('change', '.header input', function() {
 	let inputelem = $(this);
 	let id = inputelem.attr('id');
+	if (id === "scroll") {
+		return;
+	}
+
 	let checked = inputelem.is(":checked");
 
 	let israw = $("body").hasClass("raw");

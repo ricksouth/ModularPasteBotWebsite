@@ -23,8 +23,8 @@ body.darkmode .header img {
 body.darkmode .header img:hover {
     filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
 }
-body.darkmode .pastewrapper .header .pindiv {
-    border-left: 2px solid white;
+body.darkmode .pastewrapper .header .hlinks {
+    border-right: 2px solid white;
 }
 body.darkmode pre code tbody tr:nth-child(odd) {
     background-color: #313338;
@@ -50,6 +50,10 @@ body.darkmode .header a {
 body.darkmode #rawframe {
     color: white;
 }
+body.darkmode .tooltip {
+    background-color: #313338;
+    border: 2px solid white;
+}
 
 
 body:not(.darkmode) .darkmode {
@@ -67,8 +71,8 @@ body:not(.darkmode) .hljs {
 body:not(.darkmode) .header img:hover {
     filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
 }
-body:not(.darkmode) .pastewrapper .header .pindiv {
-    border-left: 2px solid black;
+body:not(.darkmode) .pastewrapper .header .hlinks {
+    border-right: 2px solid black;
 }
 body:not(.darkmode) pre code tbody tr:nth-child(odd) {
     background-color: white;
@@ -93,6 +97,10 @@ body:not(.darkmode) .header a {
 }
 body:not(.darkmode) #rawframe {
     color: black;
+}
+body:not(.darkmode) .tooltip {
+    background-color: white;
+    border: 2px solid black;
 }
 
 
@@ -184,6 +192,9 @@ body.raw #rawframe {
 .header img:hover {
     cursor: pointer;
 }
+.header .hlinks {
+    padding-right: 10px;
+}
 .header .hlinks p {
     text-decoration: underline;
 }
@@ -193,7 +204,6 @@ body.raw #rawframe {
 
 .header .pindiv {
     margin-left: 10px;
-    padding-left: 15px;
 }
 .header .pindiv p {
     margin-left: 2px;
@@ -304,3 +314,17 @@ body.darkmode .hljs-ln-code .at_function { color: #FB9522; }
 body:not(.darkmode) .hljs-ln-code .at_function { color: #FB9522; }
 body.darkmode .hljs-ln-code .at_line { color: #AC80FF; }
 body:not(.darkmode) .hljs-ln-code .at_line { color: #AC80FF; }
+
+.tooltip {
+    position: fixed;
+    z-index: 10001;
+    height: 30px;
+
+    border-radius: 5px;
+}
+.tooltip p {
+    margin: 0;
+    padding: 5px;
+
+    height: 20px;
+}
