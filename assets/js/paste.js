@@ -161,6 +161,8 @@ function loadPasteData(url, israw) {
 			if (israw) {
 				$("body").addClass("raw");
 				$(".content").html('<div id="rawframe"><pre>' + content + '</pre></div>');
+				$(".scrolldiv").hide();
+				$(".nexterrordiv").hide();
 				$(".loadspinner").hide();
 				return;
 			}
