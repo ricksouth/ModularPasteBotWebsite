@@ -20,9 +20,6 @@ body.darkmode .hljs {
 body.darkmode .header img {
     filter: invert(100%) sepia(0%) saturate(4752%) hue-rotate(213deg) brightness(112%) contrast(105%);
 }
-body.darkmode .header img:hover {
-    filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
-}
 body.darkmode .pastewrapper .header .hlinks {
     border-right: 2px solid white;
 }
@@ -31,10 +28,6 @@ body.darkmode pre code tbody tr:nth-child(odd) {
 }
 body.darkmode pre code tbody tr:nth-child(even) {
     background-color: #373a40;
-}
-body.darkmode pre code tbody tr:hover,
-body.darkmode pre code tbody tr.selected {
-    background-color: #444536 !important;
 }
 body.darkmode .hljs-ln-numbers {
     color: #ccc;
@@ -68,9 +61,6 @@ body:not(.darkmode) .pastewrapper .header {
 body:not(.darkmode) .hljs {
     color: black;
 }
-body:not(.darkmode) .header img:hover {
-    filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
-}
 body:not(.darkmode) .pastewrapper .header .hlinks {
     border-right: 2px solid black;
 }
@@ -79,10 +69,6 @@ body:not(.darkmode) pre code tbody tr:nth-child(odd) {
 }
 body:not(.darkmode) pre code tbody tr:nth-child(even) {
     background-color: #e1e3e8;
-}
-body:not(.darkmode) pre code tbody tr:hover,
-body:not(.darkmode) pre code tbody tr.selected {
-    background-color: #fafad9 !important;
 }
 body:not(.darkmode) .hljs-ln-numbers {
     color: #5e5e5e;
@@ -135,7 +121,6 @@ body.pinheader .pastewrapper .header {
 }
 .pastewrapper .content {
     margin-top: 10px;
-    height: calc(100vh - 62px);
 }
 .pastewrapper .content pre:last-child code {
     margin-bottom: 30px;
@@ -188,9 +173,6 @@ body.raw #rawframe {
 .header img {
     display: inline-block;
     height: 40px;
-}
-.header img:hover {
-    cursor: pointer;
 }
 .header .hlinks {
     padding-right: 10px;
@@ -264,10 +246,6 @@ pre code tbody tr {
     vertical-align: top;
     padding-right: 5px;
 }
-.hljs-ln-numbers:hover {
-    cursor: pointer;
-    filter: brightness(80%);
-}
 
 .hljs-ln-code {
     padding: 0 10px 0 10px !important;
@@ -329,4 +307,30 @@ body:not(.darkmode) .hljs-ln-code .at_line { color: #AC80FF; }
     padding: 5px;
 
     height: 20px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .header img:hover {
+        cursor: pointer;
+    }
+    .hljs-ln-numbers:hover {
+        cursor: pointer;
+        filter: brightness(80%);
+    }
+
+    body.darkmode pre code tbody tr:hover,
+    body.darkmode pre code tbody tr.selected {
+        background-color: #444536 !important;
+    }
+    body:not(.darkmode) pre code tbody tr:hover,
+    body:not(.darkmode) pre code tbody tr.selected {
+        background-color: #fafad9 !important;
+    }
+
+    body.darkmode .header img:hover {
+        filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
+    }
+    body:not(.darkmode) .header img:hover {
+        filter: invert(75%) sepia(2%) saturate(12%) hue-rotate(314deg) brightness(84%) contrast(85%);
+    }
 }

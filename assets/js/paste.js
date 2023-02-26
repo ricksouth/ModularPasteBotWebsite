@@ -52,24 +52,56 @@ $(document).on('mousedown', 'tr', function(e) {
 	window.history.replaceState(null, document.title, url + "#" + number);
 });
 
-$(document).on('mousedown', '#scrollimg', function(e) {
+$(document).on('mousedown', '#scrollimg,#nexterrorimg', function(e) {
 	let scrollimg = $(this);
+	let id = scrollimg.attr('id');
 	let src = scrollimg.attr('src');
-
-	let rows = $(".content table tr");
-	if (src.includes("_disabled")) {
-		rows.get(0).scrollIntoView({behavior: 'smooth'});
-		src = src.replace("_disabled.svg", ".svg");
-	}
-	else {
-		rows.get(rows.length - 1).scrollIntoView({behavior: 'smooth'});
-		src = src.replace(".svg", "_disabled.svg");
+	if (src.includes("loading")) {
+		return;
 	}
 
-	scrollimg.attr('src', src);
+	if (id === "scrollimg") {
+		let rows = $(".content table tr");
+		if (src.includes("_disabled")) {
+			$("html, body").animate({scrollTop: 0}, "slow");
+			src = src.replace("_disabled.svg", ".svg");
+		} else {
+			rows.get(rows.length - 1).scrollIntoView({behavior: 'smooth'});
+			src = src.replace(".svg", "_disabled.svg");
+		}
+
+		scrollimg.attr('src', src);
+	}
+	else if (id === "nexterrorimg") {
+		let selectedrow = $("tr.selected");
+
+		let rows = $(".content table tr");
+		if (selectedrow.length === 0) {
+			$(rows.get(0)).addClass("selected");
+		}
+
+		let passedselected = false;
+		rows.each(function(e) {
+			let row = $(this);
+			if (row.hasClass("selected")) {
+				passedselected = true;
+				return true;
+			}
+
+			if (passedselected) {
+				let html = row.html();
+				if (html.includes('<span class="error">')) {
+					$("tr.selected").removeClass("selected");
+					row.addClass("selected");
+					$("html, body").animate({scrollTop: row.position().top-getRowOffset()}, "slow");
+					return false;
+				}
+			}
+		});
+	}
 });
 
-const tooltipdescriptions = { "download" : "Download file", "raw" : "View raw file", "pinheader" : "Pin header to top of screen", "wraptext" : "Wrap text to fit screen", "darkmode" : "Toggle dark/light mode", "toggletooltip" : "Toggle header image tooltip visibility", "scroll" : "Scroll to bottom/top" };
+const tooltipdescriptions = { "download" : "Download file", "raw" : "View raw file", "pinheader" : "Pin header to top of screen", "wraptext" : "Wrap text to fit screen", "darkmode" : "Toggle dark/light mode", "toggletooltip" : "Toggle header image tooltip visibility", "scroll" : "Scroll to bottom/top", "nexterror" : "Scroll to the next error line" };
 $(".header img").on({
     mouseenter: function () {
 		if (!$("body").hasClass("toggletooltip") || /Mobi|Android/i.test(navigator.userAgent)) {
@@ -100,7 +132,9 @@ $(document).mousemove(function(e) {
 		return;
 	}
 
-	$(".tooltip").css('top', e.pageY+10 + 'px').css('left', e.pageX+10 + 'px');
+	let x = e.pageX+10;
+	let y = (e.pageY+10) - $(document).scrollTop();
+	$(".tooltip").css('top', y + 'px').css('left', x + 'px');
 });
 
 function loadPasteData(url, israw) {
@@ -199,27 +233,31 @@ function loadPasteData(url, israw) {
 							else {
 								$("body").addClass("wraptext");
 							}
-						}
 
-						if (wenttoline === false) {
-							let fullurl = window.location.href;
-							if (fullurl.includes("#")) {
-								let linenumber = fullurl.substring(fullurl.lastIndexOf("#") + 1, fullurl.length);
-								if (isNumeric(linenumber)) {
-									let lineint = parseInt(linenumber);
-									if (lineint < (o * 1000)) {
-										wenttoline = true;
+							if (wenttoline === false) {
+								let fullurl = window.location.href;
+								if (fullurl.includes("#")) {
+									let linenumber = fullurl.substring(fullurl.lastIndexOf("#") + 1, fullurl.length);
+									if (isNumeric(linenumber)) {
+										let lineint = parseInt(linenumber);
+										if (lineint < (o * 1000)) {
+											wenttoline = true;
 
-										let rows = $("table tr");
+											let rows = $("table tr");
 
-										if (rows.length >= lineint) {
-											let selectedrow = $(rows[lineint - 1]);
-											selectedrow.addClass("selected");
-											selectedrow.get(0).scrollIntoView({behavior: 'smooth'});
+											if (rows.length >= lineint) {
+												setTimeout( function() {
+													let selectedrow = $(rows[lineint - 1]);
+													selectedrow.addClass("selected");
+													$("html, body").animate({scrollTop: selectedrow.position().top - getRowOffset()}, "slow");
+												}, 10);
+											}
 										}
 									}
 								}
 							}
+
+							$("#scrollimg").attr('src', '/assets/images/header/scroll.svg');
 						}
 					}, 10);
 
@@ -442,18 +480,20 @@ function doExtraProcessing(count, identifier) {
 			}
 
 			if (lineclass === "info") {
-				if (rowhtml.includes("/INFO")) {
-					lineclass = "info"
-				} else if (rowhtml.includes("/WARN")) {
+				if (rowhtml.includes("/WARN") || rowhtml.includes("[Warning:")) {
 					lineclass = "warning"
-				} else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ")) {
+				} else if (rowhtml.includes("/ERROR") || rowhtml.includes("EXCEPTION") || rowhtml.includes(" crash ") || rowhtml.includes(" error ")) {
 					lineclass = "error"
 				}
 
-				if (rowoutput.includes("]:")) {
-					const [first, ...rest] = rowoutput.split(']:')
-					const second = rest.join(']:')
-					rowoutput = first + ']:' + "</span><span>" + second;
+				const rowends = ["]:", ")]"];
+				for (let rowend of rowends) {
+					if (rowoutput.includes(rowend)) {
+						const [first, ...rest] = rowoutput.split(rowend)
+						const second = rest.join(rowend)
+						rowoutput = first + rowend + "</span><span>" + second;
+						break;
+					}
 				}
 			}
 			row.html('<span class="' + lineclass + '">' + rowoutput + '</span>');
@@ -523,7 +563,7 @@ function displayFileNotFound(israw) {
 $(document).on('change', '.header input', function() {
 	let inputelem = $(this);
 	let id = inputelem.attr('id');
-	if (id === "scroll") {
+	if (id === "scroll" || id === "nexterror") {
 		return;
 	}
 
@@ -553,7 +593,7 @@ function loadHeaderSettings(initial, israw) {
 	$(".header input").each(function(e) {
 		let inputelem = $(this);
 		let id = inputelem.attr('id');
-		if (id === "scroll") {
+		if (id === "scroll" || id === "nexterror") {
 			return true;
 		}
 
@@ -591,6 +631,13 @@ function loadHeaderSettings(initial, israw) {
 /* Utility Functions */
 function getUrlPrefix() {
 	return atob("aHR0cHM6Ly9jZG4ubW9kdWxhcml0eS5nZy9wYXN0ZS8=");
+}
+
+function getRowOffset() {
+	if ($("body").hasClass("pinheader")) {
+		return 52;
+	}
+	return 0;
 }
 
 function isNumeric(value) {
