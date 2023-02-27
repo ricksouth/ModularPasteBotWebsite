@@ -194,12 +194,8 @@ function loadPasteData(url, israw) {
 
 				if (n >= 999 || l === count) {
 					const codeelem = $(".pastewrapper .content pre code")[m];
-
-					if (!content.startsWith("<?xml version")) {
-						lines = escapeHtml(lines);
-					}
-
-					$(codeelem).html(lines);
+					
+					$(codeelem).html(escapeHtml(lines));
 
 					if (extraprocessing !== "") {
 						$(codeelem).addClass("hljs");
