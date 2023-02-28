@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    overflow: visible;
 }
 body pre {
     margin: 0;
@@ -113,8 +114,8 @@ body.raw .notfound {
 }
 
 .pastewrapper {
-    width: 100vw;
-    overflow: hidden;
+    padding: 0;
+    width: 100%;
 }
 body.pinheader .pastewrapper .header {
     position: fixed !important;

@@ -66,7 +66,8 @@ $(document).on('mousedown', '#scrollimg,#nexterrorimg', function(e) {
 			$("html, body").animate({scrollTop: 0}, "slow");
 			src = src.replace("_disabled.svg", ".svg");
 		} else {
-			rows.get(rows.length - 1).scrollIntoView({behavior: 'smooth'});
+			let lastrow = $(rows.get(rows.length - 1));
+			$("html, body").animate({scrollTop: lastrow.position().top-getRowOffset()}, "slow");
 			src = src.replace(".svg", "_disabled.svg");
 		}
 
@@ -194,7 +195,7 @@ function loadPasteData(url, israw) {
 
 				if (n >= 999 || l === count) {
 					const codeelem = $(".pastewrapper .content pre code")[m];
-					
+
 					$(codeelem).html(escapeHtml(lines));
 
 					if (extraprocessing !== "") {
@@ -223,7 +224,7 @@ function loadPasteData(url, israw) {
 								}
 							});
 
-							$('<style id="maxwidthstyle" type="text/css"> .maxwidth { width: ' + maxwidth + 'px !important; } </style>').appendTo("head");
+							$('<style id="maxwidthstyle"> .maxwidth { width: ' + maxwidth + 'px !important; } </style>').appendTo("head");
 
 							if ($("#wraptextimg").attr('src').includes("_disabled")) {
 								$(".pastewrapper pre table").addClass("maxwidth");
