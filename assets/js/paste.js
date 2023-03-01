@@ -211,9 +211,10 @@ function loadPasteData(url, israw) {
 
 					const o = m;
 					window['to' + o] = setTimeout( function() {
-						doExtraProcessing(o, extraprocessing);
-
-						$(".loadspinner").hide();
+						window['top' + o] = setTimeout( function() {
+							doExtraProcessing(o, extraprocessing);
+							$(".loadspinner").hide();
+						}, 10);
 
 						if (o === m-1) {
 							let maxwidth = 0;
