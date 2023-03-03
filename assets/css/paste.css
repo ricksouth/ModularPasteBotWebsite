@@ -299,7 +299,9 @@ body:not(.darkmode) .hljs-ln-code .at_line { color: #AC80FF; }
 .tooltip {
     position: fixed;
     z-index: 10001;
-    height: 30px;
+    height: auto;
+
+    margin-right: 10px;
 
     border-radius: 5px;
 }
@@ -307,7 +309,7 @@ body:not(.darkmode) .hljs-ln-code .at_line { color: #AC80FF; }
     margin: 0;
     padding: 5px;
 
-    height: 20px;
+    height: auto;
 }
 
 @media (hover: hover) and (pointer: fine) {
