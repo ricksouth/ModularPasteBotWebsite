@@ -630,7 +630,7 @@ function loadHeaderSettings(initial, israw) {
 
 /* Utility Functions */
 function getUrlPrefix() {
-	return atob("aHR0cHM6Ly9tb2R1bGFyLXBhc3RlLWJvdC5jZmxvb2t1cC5jb20v");
+	return atob("aHR0cHM6Ly9tb2R1bGFyLXBhc3RlLWJvdC5jZmxvb2t1cC5jb20vcGFzdGUv");
 }
 
 function getRowOffset() {
